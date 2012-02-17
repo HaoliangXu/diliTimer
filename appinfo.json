@@ -1,0 +1,9 @@
+{
+    "id": "com.wikidili.diliTimer",
+    "version": "0.0.1",
+    "vendor": "Sheldon",
+    "type": "web", //other choices?
+    "main": "index.html",
+    "title": "wikiTimer",
+    "uiRevision": "2",
+}
