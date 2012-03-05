@@ -1,4 +1,4 @@
 enyo.depends(
     "source/diliTimer.js",
-    "css/diliTimer.css",
+    "css/diliTimer.css"
 );
