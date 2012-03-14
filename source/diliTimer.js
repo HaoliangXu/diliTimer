@@ -2,19 +2,29 @@ enyo.kind({
     name: "dili.diliTimer",
     kind: enyo.VFlexBox,
     components: [
-        {kind: "PickerGroup", lable: "Alarm in:", onChange: "setTimer", components: [
-            {name: "hour", value: 0},
-            {name: "minute", value: 0},
-            {name: "second", value: 0}
+        {kind: "Pane", name: "pane", flex: 1, onSelectView: "viewSelected",
+            components:[
+                {
+                    kind: enyo.VFlexBox,
+                    components: [
+                        {kind: "PickerGroup", lable: "Alarm in:", onChange: "setTimer", components: [
+                            {name: "hour", value: 0},
+                            {name: "minute", value: 0},
+                            {name: "second", value: 0}
+                        ]},
+                        {
+                            kind: "Button",
+                            caption: "Start",
+                            onclick: "buttonClick"
+                        }
+                    ],
+                },
+                {kind: "diliTimerView",
+                }
         ]},
-        {
-            kind: "Button",
-            caption: "Start",
-            onclick: "buttonClick"
-        }
     ],
-    duration: 0,
     create: function() {
+        this.duration = 0;
         this.inherited(arguments);
         this.setupHour();
         this.setupMnS();
@@ -47,4 +57,16 @@ enyo.kind({
     buttonClick: function() {
         timerController(this.$.duration);
     }
+});
+enyo.kind({
+    name: "dili.TimerView",
+    kind: enyo.VFlexBox,
+    events: {
+    },
+    components: [
+        {content: ""},
+        {kind: "Button", caption: "Cancel", onclick: "cancelClick"},
+    ],
+    cancelClick: function() {
+    },
 });

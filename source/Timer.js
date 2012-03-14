@@ -1,7 +1,11 @@
 enyo.kind({
     name: "dili.Timer",
+    events: {
+        onAlarm: "",
+    },
     components: [
         {
+            name: "setAlarm",
             kind: "PalmService",
             service: " palm//com.palm.service.timeout/",
             method: "",
