@@ -66,9 +66,9 @@ enyo.kind({
         components: [
         {name: "timeLimit", kind: "RadioGroup", width: "360px",
            onChange: "radioButtonSelected", components: [
-             {caption: "10 Sec.", value: "10"},
-             {caption: "30 Sec.", value: "30"},
-             {caption: "60 Sec.", value: "60"}
+             {name: "ten", caption: "10 Sec.", value: "10"},
+             {name: "thirty", caption: "30 Sec.", value: "30"},
+             {name: "sixty", caption: "60 Sec.", value: "60"}
       ]}
     ]},
     {kind: "Control", layoutKind: "HFlexLayout", pack: "center", align: "center",
@@ -96,10 +96,22 @@ enyo.kind({
 
   simpleTimerStarted: function () {
     this.$.startTimer.setDisabled(true);
+    this.disableRadioGroup();
   },
 
   simpleTimerEnded: function () {
     this.$.startTimer.setDisabled(false);
+    this.enableRadioGroup();
+  },
+  disableRadioGroup: function () {
+    this.$.ten.setDisabled(true);
+    this.$.thirty.setDisabled(true);
+    this.$.sixty.setDisabled(true);
+  },
+  enableRadioGroup: function () {
+    this.$.ten.setDisabled(false);
+    this.$.thirty.setDisabled(false);
+    this.$.sixty.setDisabled(false);
   }
 
 });
