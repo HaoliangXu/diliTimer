@@ -70,7 +70,7 @@ enyo.kind({
     },
     {kind: "Control", layoutKind: "HFlexLayout", pack: "center", align: "center",
         components: [
-        {name: "timeLimit", kind: "RadioGroup", width: "360px",
+        {name: "timeLimit", kind: "RadioGroup", width: "80%",
            onChange: "radioButtonSelected", components: [
              {name: "ten", caption: "10 Sec.", value: "10"},
              {name: "thirty", caption: "30 Sec.", value: "30"},
@@ -80,7 +80,7 @@ enyo.kind({
     {kind: "Control", layoutKind: "HFlexLayout", pack: "center", align: "center",
       components: [
         {name: 'startTimer', kind:'Button', caption:'Start Timer',
-           width: '360px', onclick:'timerStart'
+           width: '60%', onclick:'timerStart'
         }
     ]}
   ],
