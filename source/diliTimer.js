@@ -1,50 +1,106 @@
 enyo.kind({
-    name: "dili.diliTimer",
-    kind: enyo.VFlexBox,
-    components: [
-        {kind: "PickerGroup", lable: "Alarm in:", onChange: "setTimer", components: [
-            {name: "hour", value: 0},
-            {name: "minute", value: 0},
-            {name: "second", value: 0}
-        ]},
-        {
-            kind: "Button",
-            caption: "Start",
-            onclick: "buttonClick"
-        }
-    ],
-    duration: 0,
-    create: function() {
-        this.inherited(arguments);
-        this.setupHour();
-        this.setupMnS();
-        this.setDuration();
+  name:  'SimpleTimer',
+  kind: "RowGroup",
+  caption: "Simple Timer",
+  published: {
+    timerDuration: 30
+  },
+  events: {
+    onSimpleTimerStart: "",
+    onSimpleTimerEnd: ""
+  },
+  components: [
+    {name: "animator", kind: enyo.Animator, easingFunc: enyo.easing.linear,
+      duration: 30000, tick: 1000, onBegin: "beginAnimation",
+     onAnimate: "stepAnimation", onEnd: "endAnimation"
     },
-	setupMnS: function() {
-		var items = [];
-		for (var i=0; i<60; i++) {
-			items.push(i < 10 ? ("0"+i) : String(i));
-		}
-        this.$.second.setItems(items);
-        this.$.second.setValue(items[0]);
-		this.$.minute.setItems(items);
-        this.$.minute.setValue(items[0]);
-	},
-	setupHour: function() {
-		var items = [];
-		for (var i = 0; i <= 99; i++) {
-			items.push(String(i));
-		}
-		this.$.hour.setItems(items);
-        this.$.hour.setValue(items[0]);
-	},
-    setDuration: function() {
-        var h = parseInt(this.$.hour.getValue());
-        var m = parseInt(this.$.minute.getValue());
-        var s = parseInt(this.$.second.getValue());
-        this.$.duration = (h * 60 + m) * 60 + s;
-    },
-    buttonClick: function() {
-        timerController(this.$.duration);
-    }
+    {kind: "Control", layoutKind: "HFlexLayout", pack: "start", align: "center",
+       components: [
+        {name: 'timerProgress', kind: "ProgressBar", flex:1, minimum: 0,
+           maximum: 30, position: 0
+         }
+    ]}
+  ],
+
+  create: function () {
+    this.inherited(arguments);
+    this.setCaption("Simple Timer (" + this.timerDuration + " seconds)");
+    this.$.timerProgress.setMaximum(this.timerDuration);
+    this.$.animator.setDuration(this.timerDuration * 1000);
+  },
+
+  start: function () {
+    this.$.animator.play(0, this.timerDuration);
+  },
+
+  stepAnimation: function(inSender, inValue) {
+    this.$.timerProgress.setPosition(inValue);
+  },
+
+  beginAnimation: function(inSender, inStart, inEnd) {
+    this.$.timerProgress.setPosition(0);
+    this.doSimpleTimerStart();
+  },
+
+  endAnimation: function(inSender, inValue) {
+    this.$.timerProgress.setPosition(0);
+    this.doSimpleTimerEnd();
+  },
+
+  timerDurationChanged: function() {
+    this.setCaption("Simple Timer (" + this.timerDuration + " seconds)");
+    this.$.timerProgress.setMaximum(this.timerDuration);
+    this.$.animator.setDuration(this.timerDuration * 1000);
+  }
 });
+
+enyo.kind({
+  name:  'dili.diliTimer',
+  kind:  'enyo.Control',
+  components: [
+    {name: "simpleTimer", kind: "SimpleTimer",
+       onSimpleTimerStart: 'simpleTimerStarted',
+       onSimpleTimerEnd: 'simpleTimerEnded'
+    },
+    {kind: "Control", layoutKind: "HFlexLayout", pack: "center", align: "center",
+        components: [
+        {name: "timeLimit", kind: "RadioGroup", width: "360px",
+           onChange: "radioButtonSelected", components: [
+             {caption: "10 Sec.", value: "10"},
+             {caption: "30 Sec.", value: "30"},
+             {caption: "60 Sec.", value: "60"}
+      ]}
+    ]},
+    {kind: "Control", layoutKind: "HFlexLayout", pack: "center", align: "center",
+      components: [
+        {name: 'startTimer', kind:'Button', caption:'Start Timer',
+           width: '360px', onclick:'timerStart'
+        }
+    ]}
+  ],
+
+  create: function () {
+    var initialDuration = 10;
+    this.inherited(arguments);
+    this.$.timeLimit.setValue(initialDuration);
+    this.$.simpleTimer.setTimerDuration(initialDuration);
+  },
+
+  radioButtonSelected: function (inSender) {
+    this.$.simpleTimer.setTimerDuration(inSender.getValue());
+  },
+
+  timerStart: function () {
+    this.$.simpleTimer.start();
+  },
+
+  simpleTimerStarted: function () {
+    this.$.startTimer.setDisabled(true);
+  },
+
+  simpleTimerEnded: function () {
+    this.$.startTimer.setDisabled(false);
+  }
+
+});
+
