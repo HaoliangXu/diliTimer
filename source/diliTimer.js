@@ -62,6 +62,12 @@ enyo.kind({
        onSimpleTimerStart: 'simpleTimerStarted',
        onSimpleTimerEnd: 'simpleTimerEnded'
     },
+    {name: "timerHandler", kind: "dili.timerHandler",
+        onSetupAlarmSuccess: "setupAlarmSuccess",
+        onClearAlarmSuccess: "clearAlarmSuccess",
+        onSetupAlarmFailure: "setupAlarmFailure",
+        onClearAlarmFailure: "clearAlarmFailure"
+    },
     {kind: "Control", layoutKind: "HFlexLayout", pack: "center", align: "center",
         components: [
         {name: "timeLimit", kind: "RadioGroup", width: "360px",
@@ -84,6 +90,7 @@ enyo.kind({
     this.inherited(arguments);
     this.$.timeLimit.setValue(initialDuration);
     this.$.simpleTimer.setTimerDuration(initialDuration);
+    enyo.log("app start");
   },
 
   radioButtonSelected: function (inSender) {
@@ -95,9 +102,27 @@ enyo.kind({
   },
 
   simpleTimerStarted: function () {
+    var td = this.$.simpleTimer.getTimerDuration();
+    //TODO time and date convertor
+    td = "00:00:" + td;
+    enyo.log(td);
+    this.$.timerHandler.setupAlarm("wiki1", td, {"id":"com.wikidili.wikitimer.alarms","params":{"action":"alarmWakeup"}});
     this.$.startTimer.setDisabled(true);
     this.disableRadioGroup();
   },
+    setupAlarmSuccess: function() {
+        enyo.log("Alarm set");
+    },
+    clearAlarmSuccess: function() {
+        enyo.log("Alarm clear");
+    },
+    setupAlarmFailure: function(inSender, inError, inRequest) {
+        this.log(enyo.json.stringify(inError));
+        enyo.log("Alarm set failed");
+    },
+    clearAlarmFailure: function() {
+        enyo.log("Alarm clear failed");
+    },
 
   simpleTimerEnded: function () {
     this.$.startTimer.setDisabled(false);
