@@ -1,6 +1,6 @@
 {
     "id": "com.wikidili.dilitimer",
-    "version": "0.0.2",
+    "version": "0.1.0",
     "vendor": "Sheldon",
     "type": "web",
     "main": "index.html",

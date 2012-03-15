@@ -58,6 +58,14 @@ enyo.kind({
   name:  'dili.diliTimer',
   kind:  'enyo.Control',
   components: [
+    {kind: enyo.ApplicationEvents, onApplicationRelaunch: "relaunchHandler"},
+    {name : "makeSysSound", kind : "PalmService",
+        service : "palm://com.palm.audio/systemsounds",
+        method : "playFeedback",
+        onSuccess : "makeSoundSuccess",
+        onFailure : "makeSoundFailure"
+    },
+
     {name: "simpleTimer", kind: "SimpleTimer",
        onSimpleTimerStart: 'simpleTimerStarted',
        onSimpleTimerEnd: 'simpleTimerEnded'
@@ -106,7 +114,7 @@ enyo.kind({
     //TODO time and date convertor
     td = "00:00:" + td;
     enyo.log(td);
-    this.$.timerHandler.setupAlarm("wiki1", td, {"id":"com.wikidili.wikitimer.alarms","params":{"action":"alarmWakeup"}});
+    this.$.timerHandler.setupAlarm("wiki1", td, {"id":"com.wikidili.dilitimer","params":{"action":"alarmWakeup"}});
     this.$.startTimer.setDisabled(true);
     this.disableRadioGroup();
   },
@@ -137,6 +145,38 @@ enyo.kind({
     this.$.ten.setDisabled(false);
     this.$.thirty.setDisabled(false);
     this.$.sixty.setDisabled(false);
-  }
+  },
+    relaunchHandler: function(inSender, inEvent) {
+        this.log("relaunchHandler");
+        if (enyo.windowParams.action == "alarmWakeup") {
+            this.$.makeSysSound.call({"name": "dtmf_2"});
+        }
+    },
+    makeSoundSuccess: function(inSender, inResponse) {
+        this.log("Make sound success, results=" + enyo.json.stringify(inResponse));
+    },          
+    // Log errors to the console for debugging
+    makeSoundFailure: function(inSender, inError, inRequest) {
+        this.log(enyo.json.stringify(inError));
+    }
+
 
 });
+
+/*
+enyo.kind({
+    name: "appHandler",
+    kind: "Component",
+    components: {
+        {kind: "ApplicationEvents",
+            onUnload: "cleanup",
+            onLoad: "startup"
+        }
+    },
+    launch: function(params) {
+    },
+    cleanup: function() {
+    },
+    startup: function() }
+    },
+});*/
