@@ -59,7 +59,8 @@ enyo.kind({
   kind:  'enyo.Control',
   components: [
     {kind: enyo.ApplicationEvents, onApplicationRelaunch: "relaunchHandler"},
-    {name : "makeSysSound", kind : "PalmService",
+    {name: "timeU", kind: "dateUtils"},
+    {name: "makeSysSound", kind : "PalmService",
         service : "palm://com.palm.audio/systemsounds",
         method : "playFeedback",
         onSuccess : "makeSoundSuccess",
@@ -98,7 +99,7 @@ enyo.kind({
     this.inherited(arguments);
     this.$.timeLimit.setValue(initialDuration);
     this.$.simpleTimer.setTimerDuration(initialDuration);
-    enyo.log("app start");
+    enyo.error("app start");
   },
 
   radioButtonSelected: function (inSender) {
@@ -111,25 +112,27 @@ enyo.kind({
 
   simpleTimerStarted: function () {
     var td = this.$.simpleTimer.getTimerDuration();
-    //TODO time and date convertor
-    td = "00:00:" + td;
-    enyo.log(td);
-    this.$.timerHandler.setupAlarm("wiki1", td, {"id":"com.wikidili.dilitimer","params":{"action":"alarmWakeup"}});
+    var startTime = new Date();
+    var endTime = new Date(startTime.getTime() + td * 1000);
+    var endTimeString = this.$.timeU.DOtoS(endTime);
+    enyo.error(td + " and " + endTimeString);
+    this.$.timerHandler.setupAlarm("wiki1", endTimeString,
+        {"id":"com.wikidili.dilitimer","params":{"action":"alarmWakeup"}}
+    );
     this.$.startTimer.setDisabled(true);
     this.disableRadioGroup();
   },
     setupAlarmSuccess: function() {
-        enyo.log("Alarm set");
+        enyo.error("Alarm set");
     },
     clearAlarmSuccess: function() {
-        enyo.log("Alarm clear");
+        enyo.error("Alarm clear");
     },
     setupAlarmFailure: function(inSender, inError, inRequest) {
-        this.log(enyo.json.stringify(inError));
-        enyo.log("Alarm set failed");
+        this.error(enyo.json.stringify(inError));
     },
     clearAlarmFailure: function() {
-        enyo.log("Alarm clear failed");
+        enyo.error("Alarm clear failed");
     },
 
   simpleTimerEnded: function () {
@@ -147,17 +150,17 @@ enyo.kind({
     this.$.sixty.setDisabled(false);
   },
     relaunchHandler: function(inSender, inEvent) {
-        this.log("relaunchHandler");
+        this.error("relaunchHandler");
         if (enyo.windowParams.action == "alarmWakeup") {
             this.$.makeSysSound.call({"name": "dtmf_2"});
         }
     },
     makeSoundSuccess: function(inSender, inResponse) {
-        this.log("Make sound success, results=" + enyo.json.stringify(inResponse));
+        this.error("Make sound success, results=" + enyo.json.stringify(inResponse));
     },          
     // Log errors to the console for debugging
     makeSoundFailure: function(inSender, inError, inRequest) {
-        this.log(enyo.json.stringify(inError));
+        this.error(enyo.json.stringify(inError));
     }
 
 
@@ -180,3 +183,49 @@ enyo.kind({
     startup: function() }
     },
 });*/
+
+enyo.kind({
+    name: "dateUtils",
+    kind: "Component",
+    DOtoS: function(DO) {
+        //DateObject to String
+    	var Y = DO.getUTCFullYear();
+	    var M = DO.getUTCMonth() + 1;
+    	var D = DO.getUTCDate();
+    	var h = DO.getUTCHours();
+    	var m = DO.getUTCMinutes();
+    	var s = DO.getUTCSeconds();
+    	var Y = "" + Y;
+    	if (M < 10) M = "0" + M;
+    	if (D < 10) D = "0" + D;
+    	if (h < 10) h = "0" + h;
+    	if (m < 10) m = "0" + m;
+    	if (s < 10) s = "0" + s;
+    	//   "mm/dd/yyyy hh:mm:ss"
+    	return M + "/" + D + "/" + Y + " " + h + ":" + m + ":" +s;
+
+    },
+    TtoS: function(seconds) {
+        //time to string
+    	var sec = seconds % 60;
+	    var min = (seconds - sec) / 60;
+	
+    	var string = min + ":";
+	    if (sec < 10)
+		    string += "0";
+    	string += sec;
+	    return string;
+    },
+    TtoTS: function() {
+        //time to timeStamp
+    },
+    TStoT: function() {
+        //timeStamp to time
+    },
+    typeOfTime: function() {
+        //detect time type
+    },
+    timePlus: function() {
+        //add time to time
+    },
+});
