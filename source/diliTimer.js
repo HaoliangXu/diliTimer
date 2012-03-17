@@ -99,7 +99,6 @@ enyo.kind({
     this.inherited(arguments);
     this.$.timeLimit.setValue(initialDuration);
     this.$.simpleTimer.setTimerDuration(initialDuration);
-    enyo.error("app start");
   },
 
   radioButtonSelected: function (inSender) {
@@ -115,7 +114,7 @@ enyo.kind({
     var startTime = new Date();
     var endTime = new Date(startTime.getTime() + td * 1000);
     var endTimeString = this.$.timeU.DOtoS(endTime);
-    enyo.error(td + " and " + endTimeString);
+    this.log(td + " and " + endTimeString);
     this.$.timerHandler.setupAlarm("wiki1", endTimeString,
         {"id":"com.wikidili.dilitimer","params":{"action":"alarmWakeup"}}
     );
@@ -123,16 +122,16 @@ enyo.kind({
     this.disableRadioGroup();
   },
     setupAlarmSuccess: function() {
-        enyo.error("Alarm set");
+        this.log("Alarm set");
     },
     clearAlarmSuccess: function() {
-        enyo.error("Alarm clear");
+        this.log("Alarm clear");
     },
     setupAlarmFailure: function(inSender, inError, inRequest) {
-        this.error(enyo.json.stringify(inError));
+        this.log(enyo.json.stringify(inError));
     },
     clearAlarmFailure: function() {
-        enyo.error("Alarm clear failed");
+        this.log("Alarm clear failed");
     },
 
   simpleTimerEnded: function () {
@@ -150,17 +149,17 @@ enyo.kind({
     this.$.sixty.setDisabled(false);
   },
     relaunchHandler: function(inSender, inEvent) {
-        this.error("relaunchHandler");
+        this.log("relaunchHandler");
         if (enyo.windowParams.action == "alarmWakeup") {
             this.$.makeSysSound.call({"name": "dtmf_2"});
         }
     },
     makeSoundSuccess: function(inSender, inResponse) {
-        this.error("Make sound success, results=" + enyo.json.stringify(inResponse));
+        this.log("Make sound success, results=" + enyo.json.stringify(inResponse));
     },          
     // Log errors to the console for debugging
     makeSoundFailure: function(inSender, inError, inRequest) {
-        this.error(enyo.json.stringify(inError));
+        this.log(enyo.json.stringify(inError));
     }
 
 
