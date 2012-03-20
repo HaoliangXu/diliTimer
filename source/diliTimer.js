@@ -149,6 +149,7 @@ enyo.kind({
     this.$.sixty.setDisabled(false);
   },
     relaunchHandler: function(inSender, inEvent) {
+       enyo.windows.openPopup("source/popup/popup.html", "MyPopup", {}, {}, "158px", true);
         this.log("relaunchHandler");
         if (enyo.windowParams.action == "alarmWakeup") {
             this.$.makeSysSound.call({"name": "dtmf_2"});
