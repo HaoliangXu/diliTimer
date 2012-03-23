@@ -1,6 +1,4 @@
 //TODO:
-//disable buttons when timing
-//control minutes and seconds in 60
 //
 //
 enyo.kind({
