@@ -56,10 +56,10 @@ enyo.kind({
 
 enyo.kind({
   name:  'dili.diliTimer',
-  kind:  'enyo.Control',
+  kind: "Scroller",
   components: [
     {kind: enyo.ApplicationEvents, onApplicationRelaunch: "relaunchHandler"},
-    {name: "timeU", kind: "dateUtils"},
+    {name: "timeU", kind: "dili.dateUtils"},
     {name: "makeSysSound", kind : "PalmService",
         service : "palm://com.palm.audio/systemsounds",
         method : "playFeedback",
@@ -77,15 +77,7 @@ enyo.kind({
         onSetupAlarmFailure: "setupAlarmFailure",
         onClearAlarmFailure: "clearAlarmFailure"
     },
-    {kind: "Control", layoutKind: "HFlexLayout", pack: "center", align: "center",
-        components: [
-        {name: "timeLimit", kind: "RadioGroup", width: "80%",
-           onChange: "radioButtonSelected", components: [
-             {name: "ten", caption: "10 Sec.", value: "10"},
-             {name: "thirty", caption: "30 Sec.", value: "30"},
-             {name: "sixty", caption: "60 Sec.", value: "60"}
-      ]}
-    ]},
+    {name:"timeSetter", kind:"dili.TimePickerGroup", onTimeChange: "handleTimeChange"},
     {kind: "Control", layoutKind: "HFlexLayout", pack: "center", align: "center",
       components: [
         {name: 'startTimer', kind:'Button', caption:'Start Timer',
@@ -95,14 +87,9 @@ enyo.kind({
   ],
 
   create: function () {
-    var initialDuration = 10;
+    var initialDuration = 0;
     this.inherited(arguments);
-    this.$.timeLimit.setValue(initialDuration);
     this.$.simpleTimer.setTimerDuration(initialDuration);
-  },
-
-  radioButtonSelected: function (inSender) {
-    this.$.simpleTimer.setTimerDuration(inSender.getValue());
   },
 
   timerStart: function () {
@@ -119,7 +106,7 @@ enyo.kind({
         {"id":"com.wikidili.dilitimer","params":{"action":"alarmWakeup"}}
     );
     this.$.startTimer.setDisabled(true);
-    this.disableRadioGroup();
+    this.$.timeSetter.disableAll();
   },
     setupAlarmSuccess: function() {
         this.log("Alarm set");
@@ -136,23 +123,13 @@ enyo.kind({
 
   simpleTimerEnded: function () {
     this.$.startTimer.setDisabled(false);
-    this.enableRadioGroup();
-  },
-  disableRadioGroup: function () {
-    this.$.ten.setDisabled(true);
-    this.$.thirty.setDisabled(true);
-    this.$.sixty.setDisabled(true);
-  },
-  enableRadioGroup: function () {
-    this.$.ten.setDisabled(false);
-    this.$.thirty.setDisabled(false);
-    this.$.sixty.setDisabled(false);
+    this.$.timeSetter.enableAll();
   },
     relaunchHandler: function(inSender, inEvent) {
-       enyo.windows.openPopup("source/popup/popup.html", "MyPopup", {}, {}, "158px", true);
         this.log("relaunchHandler");
         if (enyo.windowParams.action == "alarmWakeup") {
             this.$.makeSysSound.call({"name": "dtmf_2"});
+             enyo.windows.openPopup("source/popup/popup.html", "MyPopup", {}, {}, "158px", true);
         }
     },
     makeSoundSuccess: function(inSender, inResponse) {
@@ -161,7 +138,26 @@ enyo.kind({
     // Log errors to the console for debugging
     makeSoundFailure: function(inSender, inError, inRequest) {
         this.log(enyo.json.stringify(inError));
-    }
+    },
+
+///////////////////////////timePickerGroup
+   handleTimeChange: function(inSender, inArray){
+      //check if the values for timeGroupPicker are valid , or return false
+      this.log(inArray);
+      var a = [];
+      for (var i = 0; i < 3; i++) {
+            a[i] = parseInt(inArray[i].join(""));
+            if (a[i] > inSender.max[i] && a[i] <  inSender.min[i]){
+               this.warn("TimeChange to invalid value");
+               return false;
+            };
+      }
+      
+      this.$.timeSetter.setValue(inArray);
+      var newDuration = (a[0] * 60 + a[1]) * 60 + a[2];
+      this.$.simpleTimer.setTimerDuration(newDuration);
+   },
+
 
 
 });
@@ -185,7 +181,7 @@ enyo.kind({
 });*/
 
 enyo.kind({
-    name: "dateUtils",
+    name: "dili.dateUtils",
     kind: "Component",
     DOtoS: function(DO) {
         //DateObject to String
