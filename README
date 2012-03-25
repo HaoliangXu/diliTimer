@@ -12,21 +12,25 @@ Thank you.
 
 
 FEATURES
-1 better UI to others, less click needed
-2 Timer
-3 0 - 100 hours timer
-4 wake up device
+  better UI to others, less click needed
+  Timer
+  0 - 100 hours timer
+  wake up device
 
 PLANS
-1 better UI look
-2 timePickerGroup check inputs
-4 muilti timers support, one view to manage timers, one to show on timer at a time
-5 preference support
 
-Next main version
-3 seperate parts to backgroud timer and be called by other apps
+1.0.0----------------
+  better UI look, fit for Horizontal and vertical both on TouchPad and Palm phones
 
-Extra
-6 timePickerGroup support minimium number 
+2.0.0----------------
+  muilti timers support, one view to manage timers, one to show on timer at a time
+  preference support
+
+3.0.0
+  seperate parts to backgroud timer and be called by other apps
+
+MAYBE
+  timePickerGroup check inputs
+  timePickerGroup support minimium number 
   timePickerGroup custom length of each number support
 
