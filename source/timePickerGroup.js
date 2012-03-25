@@ -113,11 +113,12 @@ enyo.kind({
       var a = [];
       for (var i = 0; i < this.len; i ++) {
          //[1,2,...,len-1,len]
-         var o = {name: "digit" + i, kind: "dili.DigitGroup", onDigitChange: "handleDigitChange", maxDigit: (i == 0? hNum : 9), digit: this.num[i], order: i};
+         var o = {name: "digit" + i, kind: "dili.DigitGroup", onDigitChange: "handleDigitChange", maxDigit: (i == 0? hNum : 9), digit: this.num[i], order: i,} 
          a.push(o);
       }
       this.createComponents(a);
-      this.setCaption(this.num.join("") + " " + this.title);
+      //TODO set in preference
+      //this.setCaption(this.num.join("") + " " + this.title);
    },
 
    handleDigitChange: function(inSender,inValue) {
@@ -135,7 +136,8 @@ enyo.kind({
          }
       }
       this.num = inArray.slice(0);
-      this.setCaption(this.num.join("") + " " + this.title)
+      //TODO set in preference
+      //this.setCaption(this.num.join("") + " " + this.title)
    },
    enableAll: function(){
       for (var i = 0; i < this.len; i ++) {

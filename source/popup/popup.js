@@ -2,8 +2,8 @@ enyo.kind({
    name: "MyPopup",
    kind: "VFlexBox",
    components:[
-      {content: "TIMES UP"},
-      {kind:"Button",name: "ButtonOK",caption: "OK", onclick: "buttonClick"},
+      {content: "TIMES UP", align: "center", style: "margin: 10px"},
+      {kind:"Button",name: "ButtonOK",caption: "OK", onclick: "buttonClick", style: "margin:10px"},
    ],
    constructor: function() {
       this.inherited(arguments);

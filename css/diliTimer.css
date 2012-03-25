@@ -1,0 +1,23 @@
+.dili-progress-button-play {
+    margin-top: -8px;
+    margin-left: -8px;
+    height: 44px;
+    width: 45px;
+    background: url(../images/icn-play.png) 10px 8px no-repeat;
+}
+
+.dili-progress-button-pause {
+    margin-top: -8px;
+    margin-left:-8px;
+    height: 45px;
+    width: 45px;
+    background: url(../images/icn-pause.png) 10px 8px no-repeat;
+}
+
+.dili-progress-button-stop {
+    margin-top:-8px;
+    width: 50px;
+    height: 43px;
+    background: transparent url(../images/icn-fillscreen.png) no-repeat 10px 8px;
+}
+
