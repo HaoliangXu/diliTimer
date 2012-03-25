@@ -50,7 +50,7 @@ enyo.kind({
         this.$.setAlarm.call(alarmParams);
     },
     clearAlarm: function(timeoutKey) {
-        this.$.remmoveAlarm.call({
+        this.$.removeAlarm.call({
             key: timeoutKey,
         });
     },
