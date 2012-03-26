@@ -6,6 +6,7 @@ enyo.kind({
   kind: "Control",
   published: {
     timerDuration: 30,
+    timerPosition: 0,
   },
   events: {
      onSimpleTimerStop: "",
@@ -45,7 +46,7 @@ enyo.kind({
     this.buttonStatus = {start:"START",resume:"RESUME",pause:"PAUSE"};
    this.$.title.setContent(this.buttonStatus.start);
     this.$.totalTime.setContent(timeU.TtoS(this.timerDuration));
-    this.$.timeRemaind.setContent(timeU.TtoS(this.$.progressButton.getPosition()))
+    this.$.timeRemaind.setContent(timeU.TtoS(this.timerDuration - this.timerPosition));
     this.$.progressButton.setMaximum(this.timerDuration);
     this.$.animator.setDuration(this.timerDuration * 1000);
   },
@@ -65,6 +66,7 @@ enyo.kind({
            break;
         case this.status.stopped:
            //to start
+           this.$.animator.setDuration(this.timerDuration * 1000);
            this.$.animator.play(0, this.timerDuration);
            this.$.ppButton.addClass("dili-progress-button-pause");
            this.$.ppButton.removeClass("dili-progress-button-play");
@@ -75,7 +77,8 @@ enyo.kind({
            break;
         case this.status.paused:
            //to resume
-           this.$.animator.play(this.$.progressButton.getPosition(), this.timerDuration);
+           this.$.animator.setDuration((this.timerDuration - this.timerPosition) * 1000);
+           this.$.animator.play(this.timerPosition, this.timerDuration);
            this.$.ppButton.addClass("dili-progress-button-pause");
            this.$.ppButton.removeClass("dili-progress-button-play");
            this.statu = this.status.timing;
@@ -107,7 +110,8 @@ enyo.kind({
    },
   stepAnimation: function(inSender, inValue) {
     this.$.progressButton.setPosition(inValue);
-    this.$.timeRemaind.setContent(timeU.TtoS(this.timerDuration - this.$.progressButton.getPosition()));
+    this.timerPosition = this.$.progressButton.getPosition();
+    this.$.timeRemaind.setContent(timeU.TtoS(this.timerDuration - this.timerPosition));
   },
 
   beginAnimation: function(inSender, inStart, inEnd) {
@@ -116,6 +120,7 @@ enyo.kind({
   },
 
   endAnimation: function(inSender, inValue) {
+     this.log("endAnimation");
     this.statu = this.status.stopped;
            this.$.title.setContent(this.buttonStatus.start);
     this.$.progressButton.setPosition(0);
@@ -127,8 +132,9 @@ enyo.kind({
   timerDurationChanged: function() {
     this.$.totalTime.setContent(timeU.TtoS(this.timerDuration));
     this.$.progressButton.setMaximum(this.timerDuration);
-    this.$.animator.setDuration(this.timerDuration * 1000);
-    this.$.timeRemaind.setContent(timeU.TtoS(this.timerDuration));
+    //this.$.animator.setDuration(this.timerDuration * 1000);
+    this.timerPosition = this.timerDuration;
+    this.$.timeRemaind.setContent(timeU.TtoS(this.timerPosition));
   }
 });
 
@@ -184,7 +190,8 @@ enyo.kind({
         this.$.timerHandler.clearAlarm("dili");
      },
      simpleTimerResumed: function() {
-       var td = this.$.simpleTimer.getTimerDuration();
+       var td = this.$.simpleTimer.getTimerDuration() - this.$.simpleTimer.getTimerPosition();
+       this.log(td);
        var startTime = new Date();
        var endTime = new Date(startTime.getTime() + td * 1000);
        var endTimeString = timeU.DOtoS(endTime);

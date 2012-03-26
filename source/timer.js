@@ -46,7 +46,7 @@ enyo.kind({
         } else {
             return false;
         }
-        enyo.log(alarmParams);
+        //enyo.log(alarmParams);
         this.$.setAlarm.call(alarmParams);
     },
     clearAlarm: function(timeoutKey) {
