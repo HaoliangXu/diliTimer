@@ -1,9 +1,11 @@
 enyo.kind({
+  //TODO change the logic to statuChanged method manage all actions
+   //all other events trigger statuChanged method
+   //this._statu to save the current statu in statuChanged method
   name:  'SimpleTimer',
   kind: "Control",
   published: {
     timerDuration: 30,
-    status: "stopped",
   },
   events: {
      onSimpleTimerStop: "",
@@ -19,25 +21,29 @@ enyo.kind({
     },
     {name: "progressButton", kind: "ProgressButton", flex:1, minimum: 0,
        position: 0,
+       //onclick: "handlePpButtonClick",
        onCancel: "handleCancel",
        components : [
           {kind: "HFlexBox",
              components: [
                 {kind: "Control", name: "ppButton", className: "dili-progress-button-play", onclick: "handlePpButtonClick"},
-                {name: "title" , content: "diliTimer"},
-                {kind: "Spacer",},
-                {name: "totalTime", content: "00:00:00"},
-                {kind: "Spacer",},
-                {name: "timeRemaind", content: "Remainding", width: "68px"},
+                {name: "title" , content: "START",width:"54px", onclick:"handlePpButtonClick"},
+                {kind: "Spacer", onclick:"handlePpButtonClick",},
+                {name: "totalTime", content: "00:00:00", onclick:"handlePpButtonClick"},
+                {kind: "Spacer", onclick:"handlePpButtonClick",},
+                {name: "timeRemaind", content: "Remainding", width: "59px"},
                 //TODO {kind: "Control", name: "stopButton", className: "dili-progress-button-stop", onclick: "handleStopButtonClick",},
-             ],
-         }
+             ],}
        ],
     },
   ],
 
   create: function () {
     this.inherited(arguments);
+    this.status = {"stopped":"stopped", "paused":"paused", "timing": "timing"};
+    this.statu = this.status.stopped;
+    this.buttonStatus = {start:"START",resume:"RESUME",pause:"PAUSE"};
+   this.$.title.setContent(this.buttonStatus.start);
     this.$.totalTime.setContent(timeU.TtoS(this.timerDuration));
     this.$.timeRemaind.setContent(timeU.TtoS(this.$.progressButton.getPosition()))
     this.$.progressButton.setMaximum(this.timerDuration);
@@ -45,50 +51,58 @@ enyo.kind({
   },
 
   handlePpButtonClick: function() {
+      this.log("handle pp button click");
      //determin play or pause or resume first
-     switch (this.status) {
-        case "timing":
+     switch (this.statu) {
+        case this.status.timing:
            //to pause)
            this.$.animator.stop();
            this.$.ppButton.addClass("dili-progress-button-play");
            this.$.ppButton.removeClass("dili-progress-button-pause");
-           this.status = "paused";
+           this.statu = this.status.paused;
+           this.$.title.setContent(this.buttonStatus.resume);
            this.doSimpleTimerPause();
            break;
-        case "stopped":
+        case this.status.stopped:
            //to start
            this.$.animator.play(0, this.timerDuration);
            this.$.ppButton.addClass("dili-progress-button-pause");
            this.$.ppButton.removeClass("dili-progress-button-play");
-           this.status = "timing";
+           this.statu = this.status.timing;
+           this.$.title.setContent(this.buttonStatus.pause);
            this.doSimpleTimerStart();
            if (this.timerDuration == 0) this.endAnimation();
            break;
-        case "paused":
+        case this.status.paused:
            //to resume
            this.$.animator.play(this.$.progressButton.getPosition(), this.timerDuration);
            this.$.ppButton.addClass("dili-progress-button-pause");
            this.$.ppButton.removeClass("dili-progress-button-play");
-           this.status = "timing";
+           this.statu = this.status.timing;
+           this.$.title.setContent(this.buttonStatus.pause);
            this.doSimpleTimerResume();
            break;
      }
+     return false;
   },
    handleCancel: function() {
+      this.log("handle Cancel");
       //when the cancel of progressbutton clicked
-     switch (this.status) {
-        case "timing":
+     switch (this.statu) {
+        case this.status.timing:
            //to pause)
            this.$.animator.stop();
            this.$.ppButton.addClass("dili-progress-button-play");
            this.$.ppButton.removeClass("dili-progress-button-pause");
            break;
-        case "paused":
+        case this.status.paused:
            //to resume
            break;
+        return false;
      }
      this.$.progressButton.setPosition(0);
-     this.status = "stopped";
+     this.statu = this.status.stopped;
+     this.$.title.setContent(this.buttonStatus.start);
      this.doSimpleTimerStop();
    },
   stepAnimation: function(inSender, inValue) {
@@ -102,7 +116,8 @@ enyo.kind({
   },
 
   endAnimation: function(inSender, inValue) {
-    this.status = "stopped";
+    this.statu = this.status.stopped;
+           this.$.title.setContent(this.buttonStatus.start);
     this.$.progressButton.setPosition(0);
      this.$.ppButton.addClass("dili-progress-button-play");
      this.$.ppButton.removeClass("dili-progress-button-pause");
@@ -119,7 +134,7 @@ enyo.kind({
 
 enyo.kind({
   name:  'dili.diliTimer',
-  kind: "Control",
+  kind: "VFlexBox",
   components: [
     {kind: enyo.ApplicationEvents, onApplicationRelaunch: "relaunchHandler"},
     {name: "makeSysSound", kind : "PalmService",
@@ -128,31 +143,39 @@ enyo.kind({
         onSuccess : "makeSoundSuccess",
         onFailure : "makeSoundFailure"
     },
-
-    {name: "simpleTimer", kind: "SimpleTimer",
-     onSimpleTimerStop: "simpleTimerStopped",
-     onSimpleTimerPause: "simpleTimerPaused",
-     onSimpleTimerResume: "simpleTimerResumed",
-       onSimpleTimerStart: 'simpleTimerStarted',
-       onSimpleTimerEnd: 'simpleTimerEnded'
-    },
     {name: "timerHandler", kind: "dili.timerHandler",
         onSetupAlarmSuccess: "setupAlarmSuccess",
         onClearAlarmSuccess: "clearAlarmSuccess",
         onSetupAlarmFailure: "setupAlarmFailure",
         onClearAlarmFailure: "clearAlarmFailure"
     },
-    //TODO wrap in a scroller
-      {name:"timeSetter", kind:"dili.TimePickerGroup",
-         onTimeChange: "handleTimeChange"
-      },
+    {kind: "PageHeader", components: [
+       {name: "simpleTimer", flex:1,kind: "SimpleTimer",
+        onSimpleTimerStop: "simpleTimerStopped",
+        onSimpleTimerPause: "simpleTimerPaused",
+        onSimpleTimerResume: "simpleTimerResumed",
+          onSimpleTimerStart: 'simpleTimerStarted',
+          onSimpleTimerEnd: 'simpleTimerEnded'
+       },
+    ]},
+    {kind: "Pane",flex:1,components:[
+       {kind:"Scroller", components:[
+         {name:"timeSetter", flex:1,kind:"dili.TimePickerGroup",
+            onTimeChange: "handleTimeChange"
+         },
+       ]},
+    ]},
   ],
 
   create: function () {
     var initialDuration = 0;
     this.inherited(arguments);
     this.$.simpleTimer.setTimerDuration(initialDuration);
+    var DeviceInfo = enyo.fetchDeviceInfo();
+    //this.log(DeviceInfo);
+    this.relaunchHandler();
   },
+////////////////////////////simpleTimer
      simpleTimerStopped: function () {
         this.simpleTimerEnded();
         this.$.timerHandler.clearAlarm("dili");
@@ -165,7 +188,6 @@ enyo.kind({
        var startTime = new Date();
        var endTime = new Date(startTime.getTime() + td * 1000);
        var endTimeString = timeU.DOtoS(endTime);
-       this.log(td + " and " + endTimeString);
        this.$.timerHandler.setupAlarm("dili", endTimeString,
            {"id":"com.wikidili.dilitimer","params":{"action":"alarmWakeup"}}
        );
@@ -178,11 +200,10 @@ enyo.kind({
   simpleTimerEnded: function () {
     this.$.timeSetter.enableAll();
   },
+//////////////////////////////////////alarm
     setupAlarmSuccess: function() {
-        this.log("Alarm set");
     },
     clearAlarmSuccess: function() {
-        this.log("Alarm clear");
     },
     setupAlarmFailure: function(inSender, inError, inRequest) {
         this.log(enyo.json.stringify(inError));
@@ -190,16 +211,15 @@ enyo.kind({
     clearAlarmFailure: function() {
         this.log("Alarm clear failed");
     },
-
+//////////////////////////////////////////////////application control
     relaunchHandler: function(inSender, inEvent) {
-        this.log("relaunchHandler");
         if (enyo.windowParams.action == "alarmWakeup") {
             this.$.makeSysSound.call({"name": "dtmf_2"});
              enyo.windows.openPopup("source/popup/popup.html", "MyPopup", {}, {}, "100px", true);
         }
     },
+////////////////////////////////////////////////sound control
     makeSoundSuccess: function(inSender, inResponse) {
-        this.log("Make sound success, results=" + enyo.json.stringify(inResponse));
     },          
     // Log errors to the console for debugging
     makeSoundFailure: function(inSender, inError, inRequest) {
@@ -209,16 +229,14 @@ enyo.kind({
 ///////////////////////////timePickerGroup
    handleTimeChange: function(inSender, inArray){
       //check if the values for timeGroupPicker are valid , or return false
-      this.log(inArray);
       var a = [];
       for (var i = 0; i < 3; i++) {
-            a[i] = parseInt(inArray[i].join(""));
+            a[i] = parseInt(inArray[i].join(""),10);
             if (a[i] > inSender.max[i] && a[i] <  inSender.min[i]){
                this.warn("TimeChange to invalid value");
                return false;
             };
       }
-      
       this.$.timeSetter.setValue(inArray);
       var newDuration = (a[0] * 60 + a[1]) * 60 + a[2];
       this.$.simpleTimer.setTimerDuration(newDuration);
@@ -227,24 +245,6 @@ enyo.kind({
 
 
 });
-
-/*
-enyo.kind({
-    name: "appHandler",
-    kind: "Component",
-    components: {
-        {kind: "ApplicationEvents",
-            onUnload: "cleanup",
-            onLoad: "startup"
-        }
-    },
-    launch: function(params) {
-    },
-    cleanup: function() {
-    },
-    startup: function() }
-    },
-});*/
 
 enyo.kind({
     name: "dili.dateUtils",
@@ -272,7 +272,7 @@ enyo.kind({
        var string = "";
     	var sec = seconds % 60;
 	    var min = (seconds - sec) / 60;
-	var hour = parseInt(min / 60);
+	var hour = parseInt(min / 60, 10);
 	min -= hour * 60;
          if (hour < 10) string = "0";
             string += hour + ":";
