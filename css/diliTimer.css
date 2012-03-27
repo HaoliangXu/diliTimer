@@ -1,16 +1,16 @@
 .dili-progress-button-play {
     margin-top: -8px;
-    margin-left: -8px;
+    margin-left: -10px;
     height: 44px;
-    width: 45px;
+    width: 40px;
     background: url(../images/icn-play.png) 10px 8px no-repeat;
 }
 
 .dili-progress-button-pause {
     margin-top: -8px;
-    margin-left:-8px;
+    margin-left:-10px;
     height: 45px;
-    width: 45px;
+    width: 40px;
     background: url(../images/icn-pause.png) 10px 8px no-repeat;
 }
 
