@@ -28,7 +28,7 @@ enyo.kind({
           {kind: "HFlexBox",
              components: [
                 {kind: "Control", name: "ppButton", className: "dili-progress-button-play", onclick: "handlePpButtonClick"},
-                {name: "title" , content: "START",width:"54px", onclick:"handlePpButtonClick"},
+                {name: "title" , content: "Start",width:"54px", onclick:"handlePpButtonClick"},
                 {kind: "Spacer", onclick:"handlePpButtonClick",},
                 {name: "totalTime", content: "00:00:00", onclick:"handlePpButtonClick"},
                 {kind: "Spacer", onclick:"handlePpButtonClick",},
@@ -43,7 +43,7 @@ enyo.kind({
     this.inherited(arguments);
     this.status = {"stopped":"stopped", "paused":"paused", "timing": "timing"};
     this.statu = this.status.stopped;
-    this.buttonStatus = {start:"START",resume:"RESUME",pause:"PAUSE"};
+    this.buttonStatus = {start:"Start",resume:"Resume",pause:"Pause"};
    this.$.title.setContent(this.buttonStatus.start);
     this.$.totalTime.setContent(timeU.TtoS(this.timerDuration));
     this.$.timeRemaind.setContent(timeU.TtoS(this.timerDuration - this.timerPosition));
