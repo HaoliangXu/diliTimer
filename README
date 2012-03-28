@@ -12,7 +12,7 @@ Thank you.
 
 
 FEATURES
-  better UI to others, less click needed
+  better UI than others, less click needed
   Timer
   0 - 100 hours timer
   wake up device
@@ -21,12 +21,10 @@ PLANS
 
 1.0.0----------------
   better UI look, fit for Horizontal and vertical both on TouchPad and Palm phones
-  easier to click to start and pause
-  smooth progress
 
 2.0.0----------------
   muilti timers support, one view to manage timers, one to show on timer at a time
-  preference support(smooth progress)
+  preference support
 
 3.0.0
   seperate parts to backgroud timer and be called by other apps
@@ -35,4 +33,5 @@ MAYBE
   timePickerGroup check inputs
   timePickerGroup support minimium number 
   timePickerGroup custom length of each number support
+  smooth progress
 
