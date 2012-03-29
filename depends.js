@@ -4,5 +4,5 @@ enyo.depends(
     "source/diliTimer.js",
     "source/TimePickerGroup.js",
     "source/TimerController.js",
-    "css/diliTimer.css",
+    "css/diliTimer.css"
 )

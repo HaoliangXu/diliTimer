@@ -2,7 +2,7 @@ enyo.kind({
   //TODO change the logic to statuChanged method manage all actions
    //all other events trigger statuChanged method
    //this._statu to save the current statu in statuChanged method
-  name:  'SimpleController',
+  name:  'dili.TimerController',
   kind: "Control",
   published: {
     timerDuration: 30,
