@@ -20,7 +20,7 @@ FEATURES
 PLANS
 
 1.0.0----------------
-  better UI look, fit for Horizontal and vertical both on TouchPad and Palm phones
+  find bugs and fix them
 
 2.0.0----------------
   muilti timers support, one view to manage timers, one to show on timer at a time
@@ -28,6 +28,7 @@ PLANS
 
 3.0.0
   seperate parts to backgroud timer and be called by other apps
+  some project methods
 
 MAYBE
   timePickerGroup check inputs
