@@ -41,6 +41,7 @@ enyo.kind({
     //this.log(DeviceInfo);
     this.relaunchHandler();
   },
+
 ////////////////////////////simpleTimer
      simpleTimerStopped: function () {
         this.simpleTimerEnded();
@@ -67,6 +68,7 @@ enyo.kind({
   simpleTimerEnded: function () {
     this.$.timeSetter.enableAll();
   },
+
 //////////////////////////////////////alarm
     setupAlarmSuccess: function() {
     },
@@ -78,6 +80,7 @@ enyo.kind({
     clearAlarmFailure: function() {
         this.log("Alarm clear failed");
     },
+
 //////////////////////////////////////////////////application control
     relaunchHandler: function(inSender, inEvent) {
         if (enyo.windowParams.action == "alarmWakeup") {
@@ -85,6 +88,7 @@ enyo.kind({
              enyo.windows.openPopup("source/popup/popup.html", "MyPopup", {}, {}, "100px", true);
         }
     },
+
 ////////////////////////////////////////////////sound control
     makeSoundSuccess: function(inSender, inResponse) {
     },          
@@ -108,9 +112,4 @@ enyo.kind({
       var newDuration = (a[0] * 60 + a[1]) * 60 + a[2];
       this.$.simpleTimer.setTimerDuration(newDuration);
    },
-
-
-
 });
-
-
