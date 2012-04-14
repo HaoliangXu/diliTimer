@@ -2,7 +2,7 @@ enyo.kind({
   name:  'dili.diliTimer',
   kind: "VFlexBox",
   components: [
-    {kind: enyo.ApplicationEvents, onApplicationRelaunch: "relaunchHandler"},
+    {kind: enyo.ApplicationEvents, onApplicationRelaunch: "relaunchHandler", onUnload: "unloadHandler", onLoad: "loadHandler", onBack: "backGesture"},
     {name: "makeSysSound", kind : "PalmService",
         service : "palm://com.palm.audio/systemsounds",
         method : "playFeedback",
@@ -24,40 +24,114 @@ enyo.kind({
           onSimpleTimerEnd: 'simpleTimerEnded'
        },
     ]},
-    {kind: "Pane",flex:1,components:[
-       {kind:"Scroller", components:[
+    {kind: "Pane", flex:1, onSelectView: "viewSelected", components:[
+       {name: "mainView", kind:"Scroller", components:[
          {name:"timeSetter", flex:1,kind:"dili.TimePickerGroup",
             onTimeChange: "handleTimeChange"
          },
        ]},
+       {name: "aboutView", kind:"Scroller", components:[
+          {name:"about", flex:1, kind: "dili.About", onBackClick: "goBack"},
+       ]},
+       {name: "helpView", kind:"Scroller", components:[
+          {name:"help", flex:1, kind: "dili.Help", onBackClick: "goBack"},
+       ]},
+       {name: "prefsView", kind:"Scroller", components:[
+          {name: "preferences", kind: "dili.Preferences",
+             onReceive: "prefsReceive",
+             onSave: "prefsSave",
+             onCancel: "prefsCancel",
+             onGoback: "goBack",
+          },
+       ]},
     ]},
+    {kind: "AppMenu",
+       components: [
+          {caption: "Preferences", onclick: "showPreferences"},
+          {caption: "Help", onclick: "showHelp"},
+          {caption: "About", onclick: "showAbout"},
+       ],
+    },
   ],
 
   create: function () {
     var initialDuration = 0;
+    this.endTime = new Date();
     this.inherited(arguments);
     this.$.simpleTimer.setTimerDuration(initialDuration);
-    var DeviceInfo = enyo.fetchDeviceInfo();
+    //var DeviceInfo = enyo.fetchDeviceInfo();
     //this.log(DeviceInfo);
-    this.relaunchHandler();
   },
+///////////////////////////Pane
+   viewSelected: function(inSender, inView, inPreviousView) {
+      if (inPreviousView && inPreviousView.name && inPreviousView.name == "prefsView") {
+          this.$.preferences.cancelChange();
+      }
+   },
+   prefsSave: function() {
+       if (this.$.simpleTimer.statu == this.$.simpleTimer.status.timing) {
+          var endTimeString = timeU.DOtoS(this.endTime);
+          this.$.timerHandler.setupAlarm("dili", endTimeString, this.$.preferences.prefs.wakeUpDevice,
+              {"id":"com.wikidili.dilitimer","params":{"action":"alarm"}}
+          );
+       }
+   },
+   goBack: function() {
+      this.$.pane.selectViewByName("mainView");
+   },
+   prefsReceive: function() {
+      this.relaunchHandler();
+      if (this.$.preferences.prefs.statu == "timing") {
+         var d = new Date();
+         var e = new Date(this.$.preferences.prefs.endTimeJSON);
+         d = d.getTime();
+         e = e.getTime();
+         if (e > d) {
+            var position = parseInt((e - d)/1000, 10);
+            position = this.$.preferences.prefs.duration - position;
+            this.$.simpleTimer.changeStatu(this.$.preferences.prefs.statu, position, this.$.preferences.prefs.duration);
+            var a = timeU.StoA(this.$.preferences.prefs.duration);
+            this.$.timeSetter.setValue(a);
+         }
+      }
+      if (this.$.preferences.prefs.statu == "paused") {
+         this.log(this.$.preferences.prefs.position);
+         this.$.simpleTimer.changeStatu(this.$.preferences.prefs.statu, this.$.preferences.prefs.position, this.$.preferences.prefs.duration);
+         var a = timeU.StoA(this.$.preferences.prefs.duration);
+         this.$.timeSetter.setValue(a);
+         this.$.timeSetter.disableAll();
+      }
+   },
+
+////////////////////////////AppMenu
+   showHelp: function() {
+      this.$.pane.selectViewByName("helpView");
+   },
+   showAbout: function() {
+      this.$.pane.selectViewByName("aboutView");
+   },
+   showPreferences: function() {
+      this.$.pane.selectViewByName("prefsView");
+   },
 
 ////////////////////////////simpleTimer
      simpleTimerStopped: function () {
+        this.endTime = new Date();
         this.simpleTimerEnded();
         this.$.timerHandler.clearAlarm("dili");
      },
      simpleTimerPaused: function() {
+        this.endTime = new Date();
         this.$.timerHandler.clearAlarm("dili");
      },
      simpleTimerResumed: function() {
        var td = this.$.simpleTimer.getTimerDuration() - this.$.simpleTimer.getTimerPosition();
        this.log(td);
        var startTime = new Date();
-       var endTime = new Date(startTime.getTime() + td * 1000);
-       var endTimeString = timeU.DOtoS(endTime);
-       this.$.timerHandler.setupAlarm("dili", endTimeString,
-           {"id":"com.wikidili.dilitimer","params":{"action":"alarmWakeup"}}
+       this.endTime = new Date(startTime.getTime() + td * 1000);
+       var endTimeString = timeU.DOtoS(this.endTime);
+       this.$.timerHandler.setupAlarm("dili", endTimeString, this.$.preferences.prefs.wakeUpDevice,
+           {"id":"com.wikidili.dilitimer","params":{"action":"alarm"}}
        );
      },
 
@@ -82,10 +156,34 @@ enyo.kind({
     },
 
 //////////////////////////////////////////////////application control
+    backGesture: function(inSender, inEvent) {
+       this.log();
+       if (this.$.pane.getView().name != "mainView"){
+          this.goBack();
+       }
+       inEvent.stopPropagation();
+       inEvent.preventDefault();
+    },
+    unloadHandler: function(inSender, inEvent) {
+       this.$.preferences.prefs.statu = this.$.simpleTimer.statu;
+       this.$.preferences.prefs.position = this.$.simpleTimer.timerPosition;
+       this.$.preferences.prefs.duration = this.$.simpleTimer.timerDuration;
+       this.$.preferences.prefs.endTimeJSON = this.endTime.toJSON();
+       if (!this.$.preferences.prefs.backgroundTimer) {
+          this.$.preferences.prefs.statu = "stopped";
+         this.$.timerHandler.clearAlarm("dili");
+       }
+       this.$.preferences.cancelChange();
+       this.$.preferences.saveClick();
+    },
     relaunchHandler: function(inSender, inEvent) {
-        if (enyo.windowParams.action == "alarmWakeup") {
-            this.$.makeSysSound.call({"name": "dtmf_2"});
-             enyo.windows.openPopup("source/popup/popup.html", "MyPopup", {}, {}, "100px", true);
+        if (enyo.windowParams.action == "alarm") {
+           var sp = this.$.preferences.SYSTEMSOUNDS[this.$.preferences.prefs.soundPath];
+           this.log(sp);
+            this.$.makeSysSound.call({"name": sp});
+            //TODO enyo.Dashboard
+            enyo.windows.addBannerMessage(this.$.preferences.prefs.alarmMsg,"{}");
+            //enyo.windows.openPopup("source/popup/popup.html", "MyPopup", {"alarmMsg": this.$.preferences.prefs.alarmMsg}, {}, "100px", true);
         }
     },
 
