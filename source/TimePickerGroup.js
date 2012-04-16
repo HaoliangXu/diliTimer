@@ -13,13 +13,13 @@ enyo.kind({
       timeArray: [[0, 0], [0, 0], [0, 0]],
       max:[99,59,59],
       min:[0,0,0],
-      tt: ["h","m","s"],//title token
+      tt: ["hr","min","sec"],//title token
    },
    create: function() {
       this.inherited(arguments);
       var a = [];
       for (var i = 0; i < 3; i ++) {
-         var o = {name: "group" + i, kind: "dili.NumGroup", maxNum: this.max[i], title: this.tt[i], onNumChange: "handleNumChange", num: this.timeArray[i], order: i};
+         var o = {name: "group" + i, kind: "dili.NumGroup", maxNum: this.max[i], caption: this.tt[i], onNumChange: "handleNumChange", num: this.timeArray[i], order: i};
          a.push(o);
       }
       this.createComponents(a);
@@ -117,8 +117,6 @@ enyo.kind({
          a.push(o);
       }
       this.createComponents(a);
-      //TODO set in preference
-      //this.setCaption(this.num.join("") + " " + this.title);
    },
 
    handleDigitChange: function(inSender,inValue) {
@@ -136,8 +134,6 @@ enyo.kind({
          }
       }
       this.num = inArray.slice(0);
-      //TODO set in preference
-      //this.setCaption(this.num.join("") + " " + this.title)
    },
    enableAll: function(){
       for (var i = 0; i < this.len; i ++) {
@@ -170,8 +166,10 @@ enyo.kind({
    create: function () {
       this.inherited(arguments);
       var a = [];
+      var deviceInfo = (enyo.fetchDeviceInfo().screenHeight) > 500;
+      var s = "margin: 0;" + (deviceInfo ? "line-height:40px;font-size: 25px;height:40px; width: 46px" : "");
       for (var i = this.minDigit; i <= this.maxDigit; i += this.step) {
-         var o = {name: "button"+ i, kind: "Button", caption: "" + i, onclick: "handleButtonClick", style: "margin: 0",};
+         var o = {name: "button"+ i, kind: "Button", caption: "" + i, onclick: "handleButtonClick", style: s};
          a.push(o);
       };
       this.createComponents(a);

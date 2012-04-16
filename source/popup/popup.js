@@ -2,7 +2,7 @@ enyo.kind({
    name: "MyPopup",
    kind: "VFlexBox",
    components:[
-      {content: "TIME'S UP", align: "center", style: "margin: 10px"},
+      {content: "TIME IS UP", align: "center", style: "margin: 10px"},
       {kind:"Button",name: "ButtonOK",caption: "OK", onclick: "buttonClick", style: "margin:10px"},
    ],
    constructor: function() {

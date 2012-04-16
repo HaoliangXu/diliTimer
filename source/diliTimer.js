@@ -3,37 +3,42 @@ enyo.kind({
   kind: "VFlexBox",
   components: [
     {kind: enyo.ApplicationEvents, onApplicationRelaunch: "relaunchHandler"},
-    {name: "makeSysSound", kind : "PalmService",
-        service : "palm://com.palm.audio/systemsounds",
-        method : "playFeedback",
-        onSuccess : "makeSoundSuccess",
-        onFailure : "makeSoundFailure"
-    },
     {name: "timerHandler", kind: "dili.AlarmController",
         onSetupAlarmSuccess: "setupAlarmSuccess",
         onClearAlarmSuccess: "clearAlarmSuccess",
         onSetupAlarmFailure: "setupAlarmFailure",
         onClearAlarmFailure: "clearAlarmFailure"
     },
-    {kind: "PageHeader", components: [
-       {name: "simpleTimer", flex:1,kind: "dili.TimerController",
+  ],
+
+  create: function () {
+   var deviceInfo = (enyo.fetchDeviceInfo().screenHeight) > 500;
+   var st = 
+       {name: "simpleTimer", kind: "dili.TimerController",
         onSimpleTimerStop: "simpleTimerStopped",
         onSimpleTimerPause: "simpleTimerPaused",
         onSimpleTimerResume: "simpleTimerResumed",
           onSimpleTimerStart: 'simpleTimerStarted',
           onSimpleTimerEnd: 'simpleTimerEnded'
-       },
-    ]},
-    {kind: "Pane",flex:1,components:[
+       };
+    var pn = {kind: "Pane",flex:1,components:[
        {kind:"Scroller", components:[
          {name:"timeSetter", flex:1,kind:"dili.TimePickerGroup",
             onTimeChange: "handleTimeChange"
          },
        ]},
-    ]},
-  ],
-
-  create: function () {
+    ]};
+   var ph = {kind:"PageHeader"};
+    if (deviceInfo) {
+       ph.components = [];
+       st.flex = 1;
+       ph.components[0] = st;
+       st = ph;
+    } else {
+       st.style = "margin: 5px";
+    }
+   this.createComponent(st,{owner: this});
+   this.createComponent(pn,{owner: this});
     var initialDuration = 0;
     this.inherited(arguments);
     this.$.simpleTimer.setTimerDuration(initialDuration);
@@ -81,16 +86,8 @@ enyo.kind({
 //////////////////////////////////////////////////application control
     relaunchHandler: function(inSender, inEvent) {
         if (enyo.windowParams.action == "alarmWakeup") {
-            this.$.makeSysSound.call({"name": "dtmf_2"});
              enyo.windows.openPopup("source/popup/popup.html", "MyPopup", {}, {}, "100px", true);
         }
-    },
-////////////////////////////////////////////////sound control
-    makeSoundSuccess: function(inSender, inResponse) {
-    },          
-    // Log errors to the console for debugging
-    makeSoundFailure: function(inSender, inError, inRequest) {
-        this.log(enyo.json.stringify(inError));
     },
 
 ///////////////////////////timePickerGroup
