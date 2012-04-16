@@ -3,6 +3,7 @@ enyo.kind({
   kind: "VFlexBox",
   components: [
     {kind: enyo.ApplicationEvents, onApplicationRelaunch: "relaunchHandler"},
+    {name: "makeSysSound", kind: "PalmService", service: "palm://com.palm.audio/systemsounds", method: "playFeedback"},
     {name: "timerHandler", kind: "dili.AlarmController",
         onSetupAlarmSuccess: "setupAlarmSuccess",
         onClearAlarmSuccess: "clearAlarmSuccess",
@@ -86,6 +87,7 @@ enyo.kind({
 //////////////////////////////////////////////////application control
     relaunchHandler: function(inSender, inEvent) {
         if (enyo.windowParams.action == "alarmWakeup") {
+           this.$.makeSysSound.call({"name": "tones_3beeps_otasp_done"});
              enyo.windows.openPopup("source/popup/popup.html", "MyPopup", {}, {}, "100px", true);
         }
     },
