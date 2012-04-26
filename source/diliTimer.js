@@ -28,12 +28,13 @@ enyo.kind({
         onSimpleTimerResume: "simpleTimerResumed",
           onSimpleTimerStart: 'simpleTimerStarted',
           onSimpleTimerEnd: 'simpleTimerEnded'
-       },
+       };
     var pn = {kind: "Pane", flex:1, onSelectView: "viewSelected", components:[
-       {name: "mainView", kind:"Scroller", components:[
-         {name:"timeSetter", flex:1,kind:"dili.TimePickerGroup",
-            onTimeChange: "handleTimeChange"
-         },
+          {name: "mainView", kind:"Scroller", components:[
+            {name:"timeSetter", flex:1,kind:"dili.TimePickerGroup",
+               onTimeChange: "handleTimeChange"
+            },
+         ]},
           {name: "aboutView", kind:"Scroller", components:[
              {name:"about", flex:1, kind: "dili.About", onBackClick: "goBack"},
           ]},
@@ -48,8 +49,7 @@ enyo.kind({
                 onGoback: "goBack",
              },
           ]},
-       ]},
-    ]};
+       ]};
    var ph = {kind:"PageHeader"};
     if (deviceInfo) {
        ph.components = [];
