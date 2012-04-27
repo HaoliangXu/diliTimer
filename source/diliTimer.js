@@ -20,7 +20,7 @@ enyo.kind({
   ],
 
   create: function () {
-   var deviceInfo = (enyo.fetchDeviceInfo().screenHeight) > 500;
+   this.deviceInfo = (enyo.fetchDeviceInfo().screenHeight) > 500;
    var st = 
        {name: "simpleTimer", kind: "dili.TimerController",
         onSimpleTimerStop: "simpleTimerStopped",
@@ -51,7 +51,7 @@ enyo.kind({
           ]},
        ]};
    var ph = {kind:"PageHeader"};
-    if (deviceInfo) {
+    if (this.deviceInfo) {
        ph.components = [];
        st.flex = 1;
        ph.components[0] = st;
@@ -65,8 +65,6 @@ enyo.kind({
     this.endTime = new Date();
     this.inherited(arguments);
     this.$.simpleTimer.setTimerDuration(initialDuration);
-    //var DeviceInfo = enyo.fetchDeviceInfo();
-    //this.log(DeviceInfo);
   },
 
 ///////////////////////////Pane
@@ -78,7 +76,7 @@ enyo.kind({
    prefsSave: function() {
        if (this.$.simpleTimer.statu == this.$.simpleTimer.status.timing) {
           var endTimeString = timeU.DOtoS(this.endTime);
-          this.$.timerHandler.setupAlarm("dili", endTimeString, this.$.preferences.prefs.wakeUpDevice,
+          this.$.timerHandler.setupAlarm("dili", endTimeString, true,
               {"id":"com.wikidili.dilitimer","params":{"action":"alarm"}}
           );
        }
@@ -133,11 +131,10 @@ enyo.kind({
      },
      simpleTimerResumed: function() {
        var td = this.$.simpleTimer.getTimerDuration() - this.$.simpleTimer.getTimerPosition();
-       this.log(td);
        var startTime = new Date();
        this.endTime = new Date(startTime.getTime() + td * 1000);
        var endTimeString = timeU.DOtoS(this.endTime);
-       this.$.timerHandler.setupAlarm("dili", endTimeString, this.$.preferences.prefs.wakeUpDevice,
+       this.$.timerHandler.setupAlarm("dili", endTimeString, true,
            {"id":"com.wikidili.dilitimer","params":{"action":"alarm"}}
        );
      },
@@ -186,11 +183,11 @@ enyo.kind({
     relaunchHandler: function(inSender, inEvent) {
         if (enyo.windowParams.action == "alarm") {
            var sp = this.$.preferences.SYSTEMSOUNDS[this.$.preferences.prefs.soundPath];
-           this.log(sp);
             this.$.makeSysSound.call({"name": sp});
             //TODO enyo.Dashboard
-            enyo.windows.addBannerMessage(this.$.preferences.prefs.alarmMsg,"{}");
-            //enyo.windows.openPopup("source/popup/popup.html", "MyPopup", {"alarmMsg": this.$.preferences.prefs.alarmMsg}, {}, "100px", true);
+            //enyo.windows.addBannerMessage(this.$.preferences.prefs.alarmMsg,"{}");
+            //window.PalmSystem.playSoundNotification("vibrate");
+            enyo.windows.openPopup("source/popup/popup.html", "MyPopup", {"alarmMsg": this.$.preferences.prefs.alarmMsg, "notPhone": this.deviceInfo}, {}, "100px", true);
         }
     },
 

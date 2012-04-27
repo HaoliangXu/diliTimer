@@ -8,6 +8,9 @@ enyo.kind({
    create: function() {
       this.inherited(arguments);
       this.$.msg.setContent(enyo.windowParams.alarmMsg);
+      if (!enyo.windowParams.notPhone){
+         document.body.style.backgroundColor = "#000";
+      }
    },
    buttonClick: function() {
       window.close();

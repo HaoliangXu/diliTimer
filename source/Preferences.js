@@ -30,11 +30,6 @@ enyo.kind({
             {kind: "Spacer"},
             {name: "backgroundTimerCheck", kind: "ToggleButton", state: true},
          ]},
-         {kind: "HFlexBox",align: "center", tapHighlight: false, components:[
-            {content: "Wake Up Device"},
-            {kind: "Spacer"},
-            {name: "wakeupDeviceCheck", kind: "ToggleButton", state: true},
-         ]},
          {kind: "RowGroup", caption: "Alarm Message", components:[
             {name: "alarmMsgInput", kind: "Input", value:"TIME IS UP"},
          ]},
@@ -42,8 +37,7 @@ enyo.kind({
             {content: "Alarm Sound Type"},
             {name: "soundTypeSelector", kind: "ListSelector", onChange: "soundTypeSelected", className: "enyo-subtext", contentPack: "end", flex: 1, items: [
                {caption: "System Sound", value: 0},
-               {caption: "System Ringtone (comming soon)", value: 1},
-               {caption: "Custom Audio (comming soon)", value: 2},
+               {caption: "Custom Audio (comming soon)", value: 1},
             ]},
          ]},
          {name: "soundPathLayout", align: "center"},
@@ -117,12 +111,6 @@ enyo.kind({
       } else {
          this.prefs.backgroundTimer = inResponse.backgroundTimer;
       }
-      if (typeof inResponse.wakeUpDevice != "boolean") {
-         this.prefs.wakeUpDevice = true;
-         this.setPreferences("wakeUpDevice", true);
-      } else {
-         this.prefs.wakeUpDevice = inResponse.wakeUpDevice;
-      }
       if (typeof inResponse.alarmMsg != "string") {
          this.prefs.alarmMsg = "TIME IS UP";
          this.setPreferences("alarmMsg", "TIME IS UP");
@@ -183,7 +171,6 @@ enyo.kind({
    setPreferencesSuccess: function(inSender, inResponse) {
       enyo.log("setPreferencesSuccess: " + enyo.json.stringify(inResponse));
       this.prefs.backgroundTimer = this.$.backgroundTimerCheck.state;
-      this.prefs.wakeUpDevice = this.$.wakeupDeviceCheck.state;
       this.prefs.alarmMsg = this.$.alarmMsgInput.value;
       this.prefs.soundType = this.$.soundTypeSelector.value;
       this.prefs.soundPath = this.$.soundPathLayout.$.soundPathSelector.value;
@@ -196,7 +183,6 @@ enyo.kind({
    saveClick: function() {
       var o = {};
       o.backgroundTimer = this.$.backgroundTimerCheck.state;
-      o.wakeUpDevice = this.$.wakeupDeviceCheck.state;
       o.alarmMsg = this.$.alarmMsgInput.value;
       o.soundType = this.$.soundTypeSelector.value;
       switch (o.soundType) {
@@ -234,7 +220,6 @@ enyo.kind({
    },
    cancelChange: function() {
       this.$.backgroundTimerCheck.setState(this.prefs.backgroundTimer);
-      this.$.wakeupDeviceCheck.setState(this.prefs.wakeUpDevice);
       this.$.alarmMsgInput.setValue(this.prefs.alarmMsg);
       this.$.soundTypeSelector.setValue(this.prefs.soundType);
       this.soundTypeSelected(this.$.soundTypeSelector);
@@ -247,7 +232,7 @@ enyo.kind({
    getPreferences: function(key) {
       this.$.getPreferencesCall.call(
          {
-            "keys": ["backgroundTimer", "wakeUpDevice", "alarmMsg", "soundType", "soundPath", "statu", "endTimeJSON", "duration", "position"],
+            "keys": ["backgroundTimer", "alarmMsg", "soundType", "soundPath", "statu", "endTimeJSON", "duration", "position"],
          }
       );
    },

@@ -30,9 +30,9 @@ enyo.kind({
                 {kind: "Control", name: "ppButton", className: "dili-progress-button-play", onclick: "handlePpButtonClick"},
                 {name: "title" , content: "Start",width:"54px", onclick:"handlePpButtonClick"},
                 {kind: "Spacer", onclick:"handlePpButtonClick",},
-                {name: "totalTime", content: "00:00:00", onclick:"handlePpButtonClick"},
+                {name: "timeRemaind", content: "00:00:00", onclick:"handlePpButtonClick"},
                 {kind: "Spacer", onclick:"handlePpButtonClick",},
-                {name: "timeRemaind", content: "Remainding", width: "59px"},
+                {name: "totalTime", content: "Remainding", width: "59px"},
                 //TODO {kind: "Control", name: "stopButton", className: "dili-progress-button-stop", onclick: "handleStopButtonClick",},
              ],}
        ],
