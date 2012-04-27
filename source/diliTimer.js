@@ -29,7 +29,7 @@ enyo.kind({
           onSimpleTimerStart: 'simpleTimerStarted',
           onSimpleTimerEnd: 'simpleTimerEnded'
        };
-    var pn = {kind: "Pane", flex:1, onSelectView: "viewSelected", components:[
+    var pn = {kind: "Pane", flex:1, onSelectView: "viewSelected", transitionKind: "enyo.transitions.Simple", components:[
           {name: "mainView", kind:"Scroller", components:[
             {name:"timeSetter", flex:1,kind:"dili.TimePickerGroup",
                onTimeChange: "handleTimeChange"
