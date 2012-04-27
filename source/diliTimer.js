@@ -186,7 +186,7 @@ enyo.kind({
             this.$.makeSysSound.call({"name": sp});
             //TODO enyo.Dashboard
             //enyo.windows.addBannerMessage(this.$.preferences.prefs.alarmMsg,"{}");
-            //window.PalmSystem.playSoundNotification("vibrate");
+            window.PalmSystem.playSoundNotification("vibrate");
             enyo.windows.openPopup("source/popup/popup.html", "MyPopup", {"alarmMsg": this.$.preferences.prefs.alarmMsg, "notPhone": this.deviceInfo}, {}, "100px", true);
         }
     },
