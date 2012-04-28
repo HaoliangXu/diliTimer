@@ -20,7 +20,7 @@ enyo.kind({
   ],
 
   create: function () {
-   this.deviceInfo = (enyo.fetchDeviceInfo().screenHeight) > 500;
+   this.deviceInfo = (enyo.fetchDeviceInfo().screenWidth) > 500;
    var st = 
        {name: "simpleTimer", kind: "dili.TimerController",
         onSimpleTimerStop: "simpleTimerStopped",
