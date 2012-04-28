@@ -30,9 +30,9 @@ enyo.kind({
                 {kind: "Control", name: "ppButton", className: "dili-progress-button-play", onclick: "handlePpButtonClick"},
                 {name: "title" , content: "Start",width:"54px", onclick:"handlePpButtonClick"},
                 {kind: "Spacer", onclick:"handlePpButtonClick",},
-                {name: "totalTime", content: "00:00:00", onclick:"handlePpButtonClick"},
+                {name: "timeRemaind", content: "00:00:00", onclick:"handlePpButtonClick"},
                 {kind: "Spacer", onclick:"handlePpButtonClick",},
-                {name: "timeRemaind", content: "Remainding", width: "59px"},
+                {name: "totalTime", content: "Remainding", width: "59px"},
                 //TODO {kind: "Control", name: "stopButton", className: "dili-progress-button-stop", onclick: "handleStopButtonClick",},
              ],}
        ],
@@ -52,7 +52,6 @@ enyo.kind({
   },
 
   handlePpButtonClick: function() {
-      this.log("handle pp button click");
      //determin play or pause or resume first
      switch (this.statu) {
         case this.status.timing:
@@ -89,7 +88,6 @@ enyo.kind({
      return false;
   },
    handleCancel: function() {
-      this.log("handle Cancel");
       //when the cancel of progressbutton clicked
      switch (this.statu) {
         case this.status.timing:
@@ -120,7 +118,6 @@ enyo.kind({
   },
 
   endAnimation: function(inSender, inValue) {
-     this.log("endAnimation");
     this.statu = this.status.stopped;
            this.$.title.setContent(this.buttonStatus.start);
     this.$.progressButton.setPosition(0);
@@ -135,7 +132,27 @@ enyo.kind({
     //this.$.animator.setDuration(this.timerDuration * 1000);
     this.timerPosition = this.timerDuration;
     this.$.timeRemaind.setContent(timeU.TtoS(this.timerPosition));
-  }
+  },
+  changeStatu: function(statu, position, duration) {
+     this.log(statu + " " + position + " " + duration);
+     if (statu != "stopped") {
+      this.setTimerDuration(duration);
+      this.setTimerPosition(position);
+     }
+      if (statu != this.statu) {
+         switch (statu) {
+            case "timing":
+               this.statu = this.status.paused;
+               this.handlePpButtonClick();
+               break;
+            case "paused":
+               this.stepAnimation(this, position);
+               this.$.title.setContent(this.buttonStatus.resume);
+               this.statu = this.status.paused;
+               break;
+         }
+      }
+  },
 });
 
 
