@@ -91,29 +91,37 @@ enyo.kind({
       //TODO when this.len doesn't equal to this.num.length
       this.len = this.num.length;
 
-      /*TODO determin which numbers are shown in each NumGroup as minimun is set
-      var max = this.maxNum;
-      var min = this.minNum;
-      var dMax = [];
-      var dMix = [];
-      for (var i = this.len - 1; i >= 0; i--) {
-         if (max - min > 10){
-            dMax[i] = 9;
-            dMin[i] = 0;
-            max = Math.floor(max / 10);
-            min = Math.floor(min / 10);
-         } else {
-            dMax[i] = max;
-            dMin[i] = min;
-         }
-      }*/
 
       //create digitGroups
       var hNum = Math.floor(this.maxNum / Math.pow(10, this.len -1));
+      var deviceInfo = enyo.fetchDeviceInfo();
+      //TODO assets for different devices
+      //var deviceInfo.screenWidth = enyo.fetchDeviceInfo().screenWidth;
+      var fontSize = 0;
+      var buttonHeight = 0;
+      var buttonWidth = 0;
+      if (deviceInfo.screenHeight == 400) {
+         buttonHeight = 18;
+         buttonWidth = 18;
+         fontSize = 16;
+      } else if (deviceInfo.screenHeight == 480) {
+         buttonHeight = 19;
+         buttonWidth = 20;
+         fontSize = 16;
+      } else if (deviceInfo.screenHeight == 800) {
+         buttonHeight = 22;
+         buttonWidth = 23;
+         fontSize = 18;
+      } else if (deviceInfo.screenHeight == 768) {
+         buttonHeight = 40;
+         buttonWidth = 46;
+         fontSize = 25;
+      }
+      this.log("button Height: " + buttonHeight + " and Width: " + buttonWidth);
       var a = [];
       for (var i = 0; i < this.len; i ++) {
          //[1,2,...,len-1,len]
-         var o = {name: "digit" + i, kind: "dili.DigitGroup", onDigitChange: "handleDigitChange", maxDigit: (i == 0? hNum : 9), digit: this.num[i], order: i,} 
+         var o = {name: "digit" + i, kind: "dili.DigitGroup", onDigitChange: "handleDigitChange", maxDigit: (i == 0? hNum : 9), digit: this.num[i], order: i, "buttonHeight": buttonHeight, "buttonWidth": buttonWidth, "fontSize": fontSize}; 
          a.push(o);
       }
       this.createComponents(a);
@@ -161,13 +169,15 @@ enyo.kind({
       digit: 0,
       step: 1, 
       order: 0,
+      buttonWidth: 27,
+      buttonHeight: 23,
+      fontSize: 20,
    },
 
    create: function () {
       this.inherited(arguments);
       var a = [];
-      var deviceInfo = (enyo.fetchDeviceInfo().screenHeight) > 500;
-      var s = "margin: 0;" + (deviceInfo ? "line-height:40px;font-size: 25px;height:40px; width: 46px" : "");
+      var s = "margin: 0; line-height:" + this.buttonHeight + "px;font-size:" + this.fontSize + "px;height:" + this.buttonHeight + "px;width:" + this.buttonWidth + "px";
       for (var i = this.minDigit; i <= this.maxDigit; i += this.step) {
          var o = {name: "button"+ i, kind: "Button", caption: "" + i, onclick: "handleButtonClick", style: s};
          a.push(o);
