@@ -101,7 +101,6 @@ enyo.kind({
          }
       }
       if (this.$.preferences.prefs.statu == "paused") {
-         this.log(this.$.preferences.prefs.position);
          this.$.simpleTimer.changeStatu(this.$.preferences.prefs.statu, this.$.preferences.prefs.position, this.$.preferences.prefs.duration);
          var a = timeU.StoA(this.$.preferences.prefs.duration);
          this.$.timeSetter.setValue(a);
@@ -162,7 +161,6 @@ enyo.kind({
 
 //////////////////////////////////////////////////application control
     backGesture: function(inSender, inEvent) {
-       this.log();
        if (this.$.pane.getView().name != "mainView"){
           this.goBack();
        }
@@ -192,7 +190,6 @@ enyo.kind({
                   this.$.customSound.audio.src = this.$.preferences.prefs.soundPath;
                   this.$.customSound.audio.load();
                   this.$.customSound.play();
-                  this.log('asdf');
                   break;
            }
             //TODO enyo.Dashboard

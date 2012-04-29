@@ -195,7 +195,6 @@ enyo.kind({
       enyo.log("getPreferencesFailure: " + enyo.json.stringify(inResponse));
    },
    setPreferencesSuccess: function(inSender, inResponse) {
-      enyo.log("setPreferencesSuccess: " + enyo.json.stringify(inResponse));
       this.prefs.backgroundTimer = this.$.backgroundTimerCheck.state;
       this.prefs.alarmMsg = this.$.alarmMsgInput.value;
       this.prefs.soundType = this.$.soundTypeSelector.value;
@@ -245,7 +244,6 @@ enyo.kind({
       }
    },
    getPermSuccess: function() {
-      this.log();
       this.$.findAudio.call({query:
          {
             select: ['title', 'path'], 

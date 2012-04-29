@@ -117,7 +117,6 @@ enyo.kind({
          buttonWidth = 46;
          fontSize = 25;
       }
-      this.log("button Height: " + buttonHeight + " and Width: " + buttonWidth);
       var a = [];
       for (var i = 0; i < this.len; i ++) {
          //[1,2,...,len-1,len]
