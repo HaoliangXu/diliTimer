@@ -9,6 +9,7 @@ enyo.kind({
           {caption: "About", onclick: "showAbout"},
        ],
     },
+    {name: 'customSound', kind: 'Sound', src:''},
     {name: "makeSysSound", kind: "PalmService", service: "palm://com.palm.audio/systemsounds", method: "playFeedback"},
     {kind: enyo.ApplicationEvents, onApplicationRelaunch: "relaunchHandler", onUnload: "unloadHandler", onLoad: "loadHandler", onBack: "backGesture"},
     {name: "timerHandler", kind: "dili.AlarmController",
@@ -182,8 +183,18 @@ enyo.kind({
     },
     relaunchHandler: function(inSender, inEvent) {
         if (enyo.windowParams.action == "alarm") {
-           var sp = this.$.preferences.SYSTEMSOUNDS[this.$.preferences.prefs.soundPath];
-            this.$.makeSysSound.call({"name": sp});
+           switch (this.$.preferences.prefs.soundType) {
+              case 0:
+                  var sp = this.$.preferences.SYSTEMSOUNDS[this.$.preferences.prefs.soundPath];
+                  this.$.makeSysSound.call({"name": sp});
+                  break;
+               case 1:
+                  this.$.customSound.audio.src = this.$.preferences.prefs.soundPath;
+                  this.$.customSound.audio.load();
+                  this.$.customSound.play();
+                  this.log('asdf');
+                  break;
+           }
             //TODO enyo.Dashboard
             //enyo.windows.addBannerMessage(this.$.preferences.prefs.alarmMsg,"{}");
             window.PalmSystem.playSoundNotification("vibrate");

@@ -1,6 +1,9 @@
 enyo.kind({
    name: "dili.Preferences",
    kind: enyo.VFlexBox,
+   published: {
+      audioFile: [],
+   },
    events: {
       onReceive: "",
       onSave: "",
@@ -24,6 +27,26 @@ enyo.kind({
          onSuccess: "setPreferencesSuccess",
          onFailure: "setPreferencesFailure",
       },
+      {
+         name: 'permitAsker',
+         kind: 'PalmService',
+         service: 'palm://com.palm.mediapermissions',
+         method: 'request',
+         onSuccess: 'getPermSuccess',
+         onFailure: 'getPermFailure'
+      },
+      {
+         kind: 'DbService',
+         dbKind: 'com.palm.media.audio.file:1',
+         onFailure: 'findAudioFailure',
+         components: [
+            {
+               name: 'findAudio',
+               method: 'find',
+               onSuccess: 'findAudioSuccess',
+            },
+         ],
+      },
       {kind: "RowGroup", caption: "Preference", components:[
          {kind: "HFlexBox",align: "center", tapHighlight: false, components:[
             {content: "Background Timer"},
@@ -37,7 +60,7 @@ enyo.kind({
             {content: "Alarm Sound Type"},
             {name: "soundTypeSelector", kind: "ListSelector", onChange: "soundTypeSelected", className: "enyo-subtext", contentPack: "end", flex: 1, items: [
                {caption: "System Sound", value: 0},
-               {caption: "Custom Audio (comming soon)", value: 1},
+               {caption: "Custom Audio", value: 1},
             ]},
          ]},
          {name: "soundPathLayout", align: "center"},
@@ -133,8 +156,11 @@ enyo.kind({
             }
             break;
          case 1:
-            break;
-         case 2:
+            if (typeof inResponse.soundPath != 'string') {
+               this.error('wrong sound path');
+            } else {
+               this.prefs.soundPath = inResponse.soundPath;
+            }
             break;
       }
       if (typeof inResponse.endTimeJSON != "string") {
@@ -185,19 +211,22 @@ enyo.kind({
       o.backgroundTimer = this.$.backgroundTimerCheck.state;
       o.alarmMsg = this.$.alarmMsgInput.value;
       o.soundType = this.$.soundTypeSelector.value;
-      switch (o.soundType) {
+      /*switch (o.soundType) {
          case 0:
             o.soundPath = this.$.soundPathLayout.$.soundPathSelector.value;
             break;
-      }
+         case 1:
+            o.soundPath = this.$.soundPathLayout.$.soundPathSelector.value;
+      }*/
+      o.soundPath = this.$.soundPathLayout.$.soundPathSelector.value;
       o.endTimeJSON = this.prefs.endTimeJSON;
       o.duration = this.prefs.duration;
       o.statu = this.prefs.statu;
       o.position = this.prefs.position;
       this.$.setPreferencesCall.call(o);
    },
-   soundTypeSelected: function(inSender, inEvent) {
-      switch (inSender.value) {
+   soundTypeSelected: function(inSender, inValue, inOldValue) {
+      switch (inValue) {
          case 0:
             var o = {};//soundpathlayout component, soundpathselector
             var oi = [];//items of soundpathselector
@@ -211,22 +240,75 @@ enyo.kind({
             this.$.soundPathLayout.render();
             break;
          case 1:
-            inSender.setValue(0);
-            break;
-         case 2:
-            inSender.setValue(0);
+            this.$.permitAsker.call({rights:{'read': ['com.palm.media.audio.file:1']}});
             break;
       }
+   },
+   getPermSuccess: function() {
+      this.log();
+      this.$.findAudio.call({query:
+         {
+            select: ['title', 'path'], 
+            where: [{prop: 'isRingtone', op: '=', val: true}],
+            from: 'com.palm.media.audio.file:1',
+         }
+      });
+   },
+   getPermFailure: function(inSender, inError) {
+      this.log(enyo.json.stringify(inError));
+      this.$.soundTypeSelector.setValue(0);
+      this.soundTypeSelected(this.$.soundTypeSelector);
+      this.$.soundPathLayout.$.soundPathSelector.setValue(this.prefs.soundPath);
+   },
+   findAudioSuccess: function(inSender, inResponse) {
+      this.setAudioFile(inResponse.results);
+   },
+   audioFileChanged: function() {
+      if (this.audioFile.length === 0) {
+         this.findAudioFailure(inSender, {error: 'no audiofile'});
+         return
+      }
+      var o = {};//soundpathlayout component, soundpathselector
+      var oi = [];//items of soundpathselector
+      for (var i in this.audioFile) {
+         oi.push({caption: this.audioFile[i].title, value: this.audioFile[i].path});
+      }
+      o = {name: "soundPathSelector", kind: "ListSelector", value:0, className: "enyo-subtext", contentPack: "end", flex: 1, items: oi};
+      this.$.soundPathLayout.destroyComponents();
+      this.$.soundPathLayout.createComponent({name: 'sntitle', content: 'Sound Name'});
+      this.$.soundPathLayout.createComponent(o);
+      this.$.soundPathLayout.render();
+      if (typeof(this.prefs.soundPath) === 'string') {//when soundpath is saved in preference
+         var soundPathValid = false;
+         for (var i in this.audioFile) {
+            if (this.audioFile[i].path === this.prefs.soundPath) {
+               soundPathValid = true;
+               break;
+            }
+         }
+         if (soundPathValid) {
+            this.$.soundPathLayout.$.soundPathSelector.setValue(this.prefs.soundPath);
+         } else {
+            this.findAudioFailure(this, {error: 'prefs.soundPath invalid'});
+         }
+      }
+   },
+   findAudioFailure: function(inSender, inError) {
+      this.log(enyo.json.stringify(inError));
+      this.$.soundTypeSelector.setValue(0);
+      this.soundTypeSelected(this.$.soundTypeSelector);
+      this.$.soundPathLayout.$.soundPathSelector.setValue(this.prefs.soundPath);
    },
    cancelChange: function() {
       this.$.backgroundTimerCheck.setState(this.prefs.backgroundTimer);
       this.$.alarmMsgInput.setValue(this.prefs.alarmMsg);
       this.$.soundTypeSelector.setValue(this.prefs.soundType);
-      this.soundTypeSelected(this.$.soundTypeSelector);
+      this.soundTypeSelected(this.$.soundTypeSelector, this.prefs.soundType);
       switch (this.prefs.soundType) {
          case 0:
             this.$.soundPathLayout.$.soundPathSelector.setValue(this.prefs.soundPath);
             break;
+         case 1:
       }
    },
    getPreferences: function(key) {
@@ -237,7 +319,6 @@ enyo.kind({
       );
    },
    setPreferences: function(key, value) {
-      this.log(key + " " + value);
       var o = {};
       o[key] = value;
       this.$.setPreferencesCall.call(o);
