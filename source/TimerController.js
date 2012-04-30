@@ -134,7 +134,6 @@ enyo.kind({
     this.$.timeRemaind.setContent(timeU.TtoS(this.timerPosition));
   },
   changeStatu: function(statu, position, duration) {
-     this.log(statu + " " + position + " " + duration);
      if (statu != "stopped") {
       this.setTimerDuration(duration);
       this.setTimerPosition(position);
