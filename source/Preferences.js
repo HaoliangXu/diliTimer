@@ -232,7 +232,7 @@ enyo.kind({
             for (var i = 0; i < this.SYSTEMSOUNDS.length; i ++) {
                oi.push({caption: this.SYSTEMSOUNDS[i], value: i});
             }
-            o = {name: "soundPathSelector", kind: "ListSelector", value:0, className: "enyo-subtext", contentPack: "end", flex: 1, items: oi};
+            o = {name: "soundPathSelector", kind: "ListSelector", className: "enyo-subtext", contentPack: "end", flex: 1, items: oi};
             this.$.soundPathLayout.destroyComponents();
             this.$.soundPathLayout.createComponent({name: "sntitle", content: "Sound Name"});
             this.$.soundPathLayout.createComponent(o);
@@ -243,14 +243,18 @@ enyo.kind({
             break;
       }
    },
-   getPermSuccess: function() {
-      this.$.findAudio.call({query:
-         {
-            select: ['title', 'path'], 
-            where: [{prop: 'isRingtone', op: '=', val: true}],
-            from: 'com.palm.media.audio.file:1',
-         }
-      });
+   getPermSuccess: function(inSender, inResponse) {
+      if (inResponse.returnValue === true && inResponse.isAllowed === true) {
+         this.$.findAudio.call({query:
+            {
+               select: ['title', 'path'], 
+               where: [{prop: 'isRingtone', op: '=', val: true}],
+               from: 'com.palm.media.audio.file:1',
+            }
+         });
+      } else {
+         this.findAudioFailure(this, {error: 'did not get Permission'});
+      }
    },
    getPermFailure: function(inSender, inError) {
       this.log(enyo.json.stringify(inError));
@@ -271,7 +275,7 @@ enyo.kind({
       for (var i in this.audioFile) {
          oi.push({caption: this.audioFile[i].title, value: this.audioFile[i].path});
       }
-      o = {name: "soundPathSelector", kind: "ListSelector", value:0, className: "enyo-subtext", contentPack: "end", flex: 1, items: oi};
+      o = {name: "soundPathSelector", kind: "ListSelector", className: "enyo-subtext", contentPack: "end", flex: 1, items: oi};
       this.$.soundPathLayout.destroyComponents();
       this.$.soundPathLayout.createComponent({name: 'sntitle', content: 'Sound Name'});
       this.$.soundPathLayout.createComponent(o);
