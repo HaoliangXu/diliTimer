@@ -196,6 +196,10 @@ enyo.kind({
             //enyo.windows.addBannerMessage(this.$.preferences.prefs.alarmMsg,"{}");
             window.PalmSystem.playSoundNotification("vibrate");
             enyo.windows.openPopup("source/popup/popup.html", "MyPopup", {"alarmMsg": this.$.preferences.prefs.alarmMsg, "notPhone": this.deviceInfo}, {}, "100px", true);
+        } else if (enyo.windowParams.action == 'stopAlarm') {
+           this.log('stopAlarm');
+           this.$.customSound.audio.src = null;
+           this.$.customSound.audio.load();
         }
     },
 
