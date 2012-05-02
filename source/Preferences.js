@@ -127,7 +127,6 @@ enyo.kind({
       this.getPreferences();
    },
    getPreferencesSuccess: function(inSender, inResponse) {
-      enyo.log("getPreferencesSuccess: " + enyo.json.stringify(inResponse));
       if (typeof inResponse.backgroundTimer != "boolean") {
          this.prefs.backgroundTimer = false;
          this.setPreferences("backgroundTimer", false);
