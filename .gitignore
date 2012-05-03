@@ -2,4 +2,4 @@ run.bat
 Google*
 *.swp
 *.*~
-publish/
+.publish/
