@@ -3,6 +3,9 @@ enyo.kind({
    kind: "VFlexBox",
    components:[
       {
+         kind: 'ApplicationEvents', onUnload: 'windowUnload'
+      },
+      {
          name: 'relaunchApp',
          kind: 'PalmService',
          service: 'palm://com.palm.applicationManager',
@@ -19,9 +22,11 @@ enyo.kind({
       }
    },
    buttonClick: function() {
+      window.close();
+   },
+   windowUnload: function () {
       this.$.relaunchApp.call(
          {id: 'com.wikidili.dilitimer', params: {action: 'stopAlarm'}}
       );
-      window.close();
    },
 })
