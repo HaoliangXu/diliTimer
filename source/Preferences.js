@@ -256,10 +256,7 @@ enyo.kind({
       }
    },
    getPermFailure: function(inSender, inError) {
-      this.log(enyo.json.stringify(inError));
-      this.$.soundTypeSelector.setValue(0);
-      this.soundTypeSelected(this.$.soundTypeSelector);
-      this.$.soundPathLayout.$.soundPathSelector.setValue(this.prefs.soundPath);
+     this.findAudioFailure(inSender, inError)
    },
    findAudioSuccess: function(inSender, inResponse) {
       this.setAudioFile(inResponse.results);
@@ -297,8 +294,9 @@ enyo.kind({
    findAudioFailure: function(inSender, inError) {
       this.log(enyo.json.stringify(inError));
       this.$.soundTypeSelector.setValue(0);
-      this.soundTypeSelected(this.$.soundTypeSelector);
+      this.soundTypeSelected(this.$.soundTypeSelector, 0);
       this.$.soundPathLayout.$.soundPathSelector.setValue(this.prefs.soundPath);
+      this.saveClick();
    },
    cancelChange: function() {
       this.$.backgroundTimerCheck.setState(this.prefs.backgroundTimer);
